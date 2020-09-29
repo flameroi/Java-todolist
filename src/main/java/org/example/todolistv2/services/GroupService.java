@@ -1,9 +1,10 @@
 package org.example.todolistv2.services;
 
 import org.example.todolistv2.entity.Group;
+import org.example.todolistv2.exceptions.NotFoundOwnerException;
+import org.example.todolistv2.exceptions.NotFoundObjectException;
+import org.example.todolistv2.exceptions.BadRequestException;
 import org.example.todolistv2.mongotemplates.GroupRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -12,89 +13,81 @@ public class GroupService {
     UserService userServices;
     ItemService itemServices;
 
-    public ResponseEntity<?> create(Group newGroup, String userId) {
-        if (userServices.exist(userId) && newGroup != null) {
-            return ResponseEntity.ok(newGroup);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    public Group create(Group newGroup, String userId) {
+        if (!userServices.exist(userId) && newGroup == null) {
+            throw new NotFoundOwnerException();
         }
+        if (newGroup == null) {
+            throw new BadRequestException();
+        }
+        return newGroup;
     }
 
-    public ResponseEntity<?> update(String userId, String groupId, Group updGroup) {
+    public Group update(String userId, String groupId, Group updGroup) {
         if (updGroup != null) {
-            Group oldGroup = groupRepository.findGroupById(groupId);
-            if (oldGroup != null) {
-                if (updGroup.getUserId() != null && userId != updGroup.getUserId()) {
-                    if (userServices.exist(updGroup.getUserId())) {
-                        oldGroup.setUserId(updGroup.getUserId());
-                    } else {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-                    }
-                }
-                if (updGroup.getName() != null) {
-                    oldGroup.setName(updGroup.getName());
-                }
-                return ResponseEntity.ok(oldGroup);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            throw new BadRequestException();
+        }
+        Group oldGroup = groupRepository.findGroupById(groupId);
+        if (oldGroup != null) {
+            throw new NotFoundObjectException();
+        }
+        if (updGroup.getUserId() != null && !userId.equals(updGroup.getUserId())) {
+            if (userServices.exist(updGroup.getUserId())) {
+                throw new BadRequestException();
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            oldGroup.setUserId(updGroup.getUserId());
         }
+        if (updGroup.getName() != null) {
+            oldGroup.setName(updGroup.getName());
+        }
+        return oldGroup;
     }
 
-    public ResponseEntity<?> remove(String groupId) {
-        Group dropedGroup = groupRepository.findGroupById(groupId);
-        if (dropedGroup != null) {
-            groupRepository.delete(dropedGroup);
-            return ResponseEntity.ok(dropedGroup);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    public Group remove(String groupId) {
+        Group removingGroup = groupRepository.findGroupById(groupId);
+        if (removingGroup == null) {
+            throw new NotFoundObjectException();
         }
+        groupRepository.delete(removingGroup);
+        return removingGroup;
     }
 
-    public ResponseEntity<?> found() {
+    public List<Group> found() {
         List<Group> groupList = groupRepository.findAll();
-        return ResponseEntity.ok(groupList);
+        return groupList;
     }
 
-    public ResponseEntity<?> found(String userId) {
+    public List<Group> found(String userId) {
         List<Group> groupList = groupRepository.findGroupByUserId(userId);
-        if (groupList != null) {
-            return ResponseEntity.ok(groupList);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (groupList == null) {
+            throw new NotFoundObjectException();
         }
+        return groupList;
     }
 
-    public ResponseEntity<?> found(String userId, String groupId) {
+    public Group found(String userId, String groupId) {
         Group group = groupRepository.findGroupById(groupId);
-        if (userServices.exist(userId)) {
-            if (group != null) {
-                return ResponseEntity.ok(group);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (!userServices.exist(userId)) {
+            throw new NotFoundOwnerException();
         }
+        if (group == null) {
+            throw new NotFoundObjectException();
+        }
+        return group;
     }
 
     void removeByUserId(String groupId) {
-        List<Group> dropedGroups = groupRepository.findGroupByUserId(groupId);
-        if (dropedGroups != null) {
-            for (Group group : dropedGroups) {
+        List<Group> removeGroups = groupRepository.findGroupByUserId(groupId);
+        if (removeGroups != null) {
+            for (Group group : removeGroups) {
                 itemServices.removeByGroupId(group.getId());
             }
-            groupRepository.deleteAll(dropedGroups);
+            groupRepository.deleteAll(removeGroups);
         }
     }
 
     boolean exist(String group_id) {
-        if (groupRepository.findGroupById(group_id) == null) {
-            return false;
-        } else {
-            return true;
-        }
+        return groupRepository.findGroupById(group_id) == null;
     }
 }
+

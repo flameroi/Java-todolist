@@ -1,10 +1,10 @@
 package org.example.todolistv2.services;
 
 import org.example.todolistv2.entity.User;
+import org.example.todolistv2.exceptions.BadRequestException;
+import org.example.todolistv2.exceptions.NotFoundObjectException;
 import org.example.todolistv2.mongotemplates.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,68 +16,55 @@ public class UserService {
     UserRepository userRepository;
     GroupService groupServices;
 
-    public ResponseEntity<?> create(User newUser) {
-        if (newUser != null) {
-            return ResponseEntity.ok(newUser);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    public User create(User newUser) {
+        if (newUser == null) {
+            throw new BadRequestException();
         }
+        return newUser;
     }
 
-    public ResponseEntity<?> update(String userId, User updUser) {
-        if (updUser != null) {
-            User oldUser = userRepository.findUserById(userId);
-            if (oldUser != null) {
-                if (updUser.getId() != null && userId != updUser.getId()) {
-                    oldUser.setId(updUser.getId());
-                }
-                if (updUser.getFullName() != null) {
-                    oldUser.setFullName(updUser.getFullName());
-                }
-                return ResponseEntity.ok(oldUser);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    public User update(String userId, User newUserInfo) {
+        if (newUserInfo == null) {
+            throw new BadRequestException();
         }
+        User oldUser = userRepository.findUserById(userId);
+        if (oldUser == null) {
+            throw new NotFoundObjectException();
+        }
+        if (newUserInfo.getFullName() != null) {
+            oldUser.setFullName(newUserInfo.getFullName());
+        }
+        return oldUser;
     }
 
-    public ResponseEntity<?> remove(String userId) {
+    public User remove(String userId) {
         User removeUser = userRepository.findUserById(userId);
-        if (removeUser != null) {
-            groupServices.removeByUserId(userId);
-            userRepository.delete(removeUser);
-            return ResponseEntity.ok(removeUser);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (removeUser == null) {
+            throw new NotFoundObjectException();
         }
+        groupServices.removeByUserId(userId);
+        userRepository.delete(removeUser);
+        return removeUser;
     }
 
-    public ResponseEntity<?> found() {
+    public List<User> found() {
         List<User> userList = userRepository.findAll();
-        if (userList != null) {
-            return ResponseEntity.ok(userList);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (userList.isEmpty()) {
+            throw new NotFoundObjectException();
         }
+        return userList;
     }
 
-    public ResponseEntity<?> found(String userId) {
-        User userList = userRepository.findUserById(userId);
-        if (userList != null) {
-            return ResponseEntity.ok(userList);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    public User getInfo(String userId) {
+        User returnUser = userRepository.findUserById(userId);
+        if (returnUser == null) {
+            throw new NotFoundObjectException();
         }
+        return returnUser;
     }
 
 
     boolean exist(String user_id) {
-        if (userRepository.findUserById(user_id) == null) {
-            return false;
-        } else {
-            return true;
-        }
+        return userRepository.findUserById(user_id) != null;
     }
 }
