@@ -1,17 +1,24 @@
 package org.example.todolistv2.services;
 
 import org.example.todolistv2.entity.Group;
+import org.example.todolistv2.exceptions.NoAccessException;
 import org.example.todolistv2.exceptions.NotFoundOwnerException;
 import org.example.todolistv2.exceptions.NotFoundObjectException;
 import org.example.todolistv2.exceptions.BadRequestException;
 import org.example.todolistv2.mongotemplates.GroupRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class GroupService {
-    GroupRepository groupRepository;
-    UserService userServices;
-    ItemService itemServices;
+    @Autowired
+    private GroupRepository groupRepository;
+    @Autowired
+    private UserService userServices;
+    @Autowired
+    private ItemService itemServices;
 
     public Group create(Group newGroup, String userId) {
         if (!userServices.exist(userId) && newGroup == null) {
@@ -24,14 +31,14 @@ public class GroupService {
     }
 
     public Group update(String userId, String groupId, Group updGroup) {
-        if (updGroup != null) {
+        if (updGroup == null) {
             throw new BadRequestException();
         }
         Group oldGroup = groupRepository.findGroupById(groupId);
-        if (oldGroup != null) {
+        if (oldGroup == null) {
             throw new NotFoundObjectException();
         }
-        if (updGroup.getUserId() != null && !userId.equals(updGroup.getUserId())) {
+        if (updGroup.getUserId() != null  && !userId.equals(updGroup.getUserId())) {
             if (userServices.exist(updGroup.getUserId())) {
                 throw new BadRequestException();
             }
@@ -43,7 +50,7 @@ public class GroupService {
         return oldGroup;
     }
 
-    public Group remove(String groupId) {
+    public Group remove(String userId, String groupId) {
         Group removingGroup = groupRepository.findGroupById(groupId);
         if (removingGroup == null) {
             throw new NotFoundObjectException();
@@ -54,6 +61,9 @@ public class GroupService {
 
     public List<Group> found() {
         List<Group> groupList = groupRepository.findAll();
+        if(groupList.isEmpty()) {
+            throw new NotFoundObjectException();
+        }
         return groupList;
     }
 
@@ -67,11 +77,11 @@ public class GroupService {
 
     public Group found(String userId, String groupId) {
         Group group = groupRepository.findGroupById(groupId);
-        if (!userServices.exist(userId)) {
-            throw new NotFoundOwnerException();
-        }
         if (group == null) {
             throw new NotFoundObjectException();
+        }
+        if (!userServices.exist(userId) || !group.getId().equals(groupId)) {
+            throw new NoAccessException();
         }
         return group;
     }
@@ -84,6 +94,11 @@ public class GroupService {
             }
             groupRepository.deleteAll(removeGroups);
         }
+    }
+
+    boolean hasAccess(String userId, String groupId){
+        Group group = groupRepository.findGroupById(groupId);
+        return group == null || !group.getUserId().equals(userId);
     }
 
     boolean exist(String group_id) {

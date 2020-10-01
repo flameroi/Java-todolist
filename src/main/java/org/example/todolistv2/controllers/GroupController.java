@@ -14,6 +14,7 @@ import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
+@RestController
 public class GroupController {
     GroupService groupServices;
 
@@ -49,11 +50,12 @@ public class GroupController {
     @ResponseBody
     public Group remove(@PathVariable String userId,
                         @PathVariable String groupId) {
-        return groupServices.remove(groupId);
+        return groupServices.remove(userId, groupId);
     }
 
     @ExceptionHandler
     public ResponseEntity<String> exceptionHandler(Exception exception, WebRequest request) {
+
         if (exception instanceof NotFoundObjectException) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

@@ -4,6 +4,7 @@ import org.example.todolistv2.entity.User;
 import org.example.todolistv2.exceptions.NotFoundObjectException;
 import org.example.todolistv2.exceptions.NotFoundOwnerException;
 import org.example.todolistv2.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,8 +14,10 @@ import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
+@RestController
 public class UserController {
-    UserService userServices;
+    @Autowired
+    private UserService userServices;
 
     @RequestMapping(method = GET, value = "/users")
     @ResponseBody
@@ -51,6 +54,7 @@ public class UserController {
     @ExceptionHandler
     public ResponseEntity<String> exceptionHandler(Exception exception, WebRequest request) {
         if (exception instanceof NotFoundObjectException) {
+            //return ResponseEntity.notFound().build();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         if (exception instanceof NotFoundOwnerException) {

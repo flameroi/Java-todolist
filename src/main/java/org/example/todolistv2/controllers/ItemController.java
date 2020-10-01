@@ -5,6 +5,7 @@ import org.example.todolistv2.exceptions.BadRequestException;
 import org.example.todolistv2.exceptions.NotFoundObjectException;
 import org.example.todolistv2.exceptions.NotFoundOwnerException;
 import org.example.todolistv2.services.ItemService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +15,16 @@ import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
+@RestController
 public class ItemController {
-    ItemService itemServices;
+    @Autowired
+    private ItemService itemServices;
 
     @RequestMapping(method = GET, value = "/users/{userId}/groups/{groupId}/items")
     @ResponseBody
     public List<Item> found(@PathVariable String userId,
                             @PathVariable String groupId) {
-        return itemServices.found(groupId);
+        return itemServices.found(userId, groupId);
     }
 
     @RequestMapping(method = GET, value = "/users/{userId}/groups/{groupId}/items/{itemId}}")
@@ -29,7 +32,7 @@ public class ItemController {
     public Item found(@PathVariable String userId,
                       @PathVariable String groupId,
                       @PathVariable String itemId) {
-        return itemServices.getInfo(groupId, itemId);
+        return itemServices.getInfo(userId, groupId, itemId);
     }
 
     @RequestMapping(method = POST, value = "/users/{userId}/groups/{groupId}/items")
@@ -37,7 +40,7 @@ public class ItemController {
     public Item addItem(@PathVariable String userId,
                         @PathVariable String groupId,
                         @RequestBody Item item) {
-        return itemServices.create(item, groupId);
+        return itemServices.create(userId, groupId, item);
     }
 
     @RequestMapping(method = PUT, value = "/users/{userId}/groups/{groupId}/items/{itemId}")
@@ -46,7 +49,7 @@ public class ItemController {
                        @PathVariable String groupId,
                        @PathVariable String itemId,
                        @RequestBody Item itemUpd) {
-        return itemServices.update(itemId, groupId, itemUpd);
+        return itemServices.update(userId, groupId, itemId, itemUpd);
     }
 
     @RequestMapping(method = DELETE, value = "/users/{userId}/groups/{groupId}/items/{itemId}")
@@ -54,7 +57,7 @@ public class ItemController {
     public Item remove(@PathVariable String userId,
                        @PathVariable String groupId,
                        @PathVariable String itemId) {
-        return itemServices.remove(itemId);
+        return itemServices.remove(userId, groupId, itemId);
     }
 
     @ExceptionHandler

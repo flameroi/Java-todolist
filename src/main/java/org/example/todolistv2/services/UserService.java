@@ -5,21 +5,23 @@ import org.example.todolistv2.exceptions.BadRequestException;
 import org.example.todolistv2.exceptions.NotFoundObjectException;
 import org.example.todolistv2.mongotemplates.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
-@Repository
+@Service
 public class UserService {
     @Autowired
-    UserRepository userRepository;
-    GroupService groupServices;
+    private UserRepository userRepository;
+    @Autowired
+    private GroupService groupServices;
 
     public User create(User newUser) {
-        if (newUser == null) {
+        if (newUser == null || newUser.getId() != null || exist(newUser.getId())) {
             throw new BadRequestException();
         }
+
+        userRepository.insert(newUser);
         return newUser;
     }
 
@@ -62,7 +64,6 @@ public class UserService {
         }
         return returnUser;
     }
-
 
     boolean exist(String user_id) {
         return userRepository.findUserById(user_id) != null;
