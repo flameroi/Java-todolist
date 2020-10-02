@@ -20,7 +20,6 @@ public class UserService {
         if (newUser == null || newUser.getId() != null || exist(newUser.getId())) {
             throw new BadRequestException();
         }
-
         userRepository.insert(newUser);
         return newUser;
     }
