@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
 
@@ -34,27 +33,29 @@ public class UserController {
 
     @RequestMapping(method = POST, value = "/users")
     @ResponseBody
-    public User userCreator(@RequestBody User user) {
-        return userServices.create(user);
+    public ResponseEntity<?> userCreator(@RequestBody User user) {
+        userServices.create(user);
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(method = PUT, value = "/users/{userId}")
     @ResponseBody
-    public User userUpdate(@RequestBody User uploadUser,
+    public ResponseEntity<?> userUpdate(@RequestBody User uploadUser,
                            @PathVariable String userId) {
-        return userServices.update(userId, uploadUser);
+        userServices.update(userId, uploadUser);
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(method = DELETE, value = "/users/{userId}")
     @ResponseBody
-    public User userDelete(@PathVariable String userId) {
-        return userServices.remove(userId);
+    public ResponseEntity<String> userDelete(@PathVariable String userId) {
+         userServices.remove(userId);
+         return ResponseEntity.ok().build();
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> exceptionHandler(Exception exception, WebRequest request) {
+    public ResponseEntity<String> exceptionHandler(Exception exception) {
         if (exception instanceof NotFoundObjectException) {
-            //return ResponseEntity.notFound().build();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         if (exception instanceof NotFoundOwnerException) {

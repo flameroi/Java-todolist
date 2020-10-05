@@ -20,17 +20,17 @@ public class GroupService {
     @Autowired
     private ItemService itemServices;
 
-    public Group create(Group newGroup, String userId) {
+    public void create(Group newGroup, String userId) {
         if (!userServices.exist(userId) && newGroup == null) {
             throw new NotFoundOwnerException();
         }
         if (newGroup == null) {
             throw new BadRequestException();
         }
-        return newGroup;
+        groupRepository.insert(newGroup);
     }
 
-    public Group update(String userId, String groupId, Group updGroup) {
+    public void update(String userId, String groupId, Group updGroup) {
         if (updGroup == null) {
             throw new BadRequestException();
         }
@@ -47,16 +47,18 @@ public class GroupService {
         if (updGroup.getName() != null) {
             oldGroup.setName(updGroup.getName());
         }
-        return oldGroup;
+        groupRepository.save(oldGroup);
     }
 
-    public Group remove(String userId, String groupId) {
+    public void remove(String userId, String groupId) {
         Group removingGroup = groupRepository.findGroupById(groupId);
         if (removingGroup == null) {
             throw new NotFoundObjectException();
         }
+        if (!removingGroup.getUserId().equals(userId)){
+            throw new NoAccessException();
+        }
         groupRepository.delete(removingGroup);
-        return removingGroup;
     }
 
     public List<Group> found() {

@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
 
@@ -37,31 +36,35 @@ public class ItemController {
 
     @RequestMapping(method = POST, value = "/users/{userId}/groups/{groupId}/items")
     @ResponseBody
-    public Item addItem(@PathVariable String userId,
+    public ResponseEntity<?> addItem(@PathVariable String userId,
                         @PathVariable String groupId,
                         @RequestBody Item item) {
-        return itemServices.create(userId, groupId, item);
+        itemServices.create(userId, groupId, item);
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(method = PUT, value = "/users/{userId}/groups/{groupId}/items/{itemId}")
     @ResponseBody
-    public Item update(@PathVariable String userId,
-                       @PathVariable String groupId,
-                       @PathVariable String itemId,
-                       @RequestBody Item itemUpd) {
-        return itemServices.update(userId, groupId, itemId, itemUpd);
+    public ResponseEntity<?> update(@PathVariable String userId,
+                                         @PathVariable String groupId,
+                                         @PathVariable String itemId,
+                                         @RequestBody Item itemUpd) {
+        itemServices.update(userId, groupId, itemId, itemUpd);
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(method = DELETE, value = "/users/{userId}/groups/{groupId}/items/{itemId}")
     @ResponseBody
-    public Item remove(@PathVariable String userId,
+    public ResponseEntity<?> remove(@PathVariable String userId,
                        @PathVariable String groupId,
                        @PathVariable String itemId) {
-        return itemServices.remove(userId, groupId, itemId);
+        itemServices.remove(userId, groupId, itemId);
+        return ResponseEntity.ok().build();
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> exceptionHandler(Exception exception, WebRequest request) {
+//    public ResponseEntity<String> exceptionHandler(Exception exception, WebRequest request) {
+    public ResponseEntity<String> exceptionHandler(Exception exception) {
         if (exception instanceof NotFoundOwnerException) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }

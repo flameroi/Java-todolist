@@ -19,7 +19,7 @@ public class ItemService {
     @Autowired
     private GroupService groupServices;
 
-    public Item create(String userId, String groupId ,Item newItem) {
+    public void create(String userId, String groupId , Item newItem) {
         if (groupServices.exist(groupId)) {
             throw new NotFoundOwnerException();
         }
@@ -32,10 +32,9 @@ public class ItemService {
         if(groupServices.hasAccess(userId, groupId) || !newItem.getGroupId().equals(groupId)){
             throw  new NoAccessException();
         }
-        return newItem;
     }
 
-    public Item remove(String  userId, String groupId, String itemId) {
+    public void remove(String  userId, String groupId, String itemId) {
         Item removingItem = itemRepository.findItemById(itemId);
         if (removingItem == null) {
             throw new NotFoundObjectException();
@@ -44,7 +43,6 @@ public class ItemService {
             throw  new NoAccessException();
         }
         itemRepository.delete(removingItem);
-        return removingItem;
     }
 
 
@@ -82,7 +80,7 @@ public class ItemService {
         return itemInfo;
     }
 
-    public Item update(String userId, String groupId, String itemId, Item updItem) {
+    public void update(String userId, String groupId, String itemId, Item updItem) {
         if (updItem == null) {
             throw new BadRequestException();
         }
@@ -106,7 +104,6 @@ public class ItemService {
         if (updItem.getActivity() != null) {
             oldItem.setActivity(updItem.getActivity());
         }
-        return oldItem;
     }
 
     public void removeByGroupId(String groupId) {

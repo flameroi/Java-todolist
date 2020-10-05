@@ -8,7 +8,6 @@ import org.example.todolistv2.services.GroupService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
 
@@ -33,28 +32,31 @@ public class GroupController {
 
     @RequestMapping(method = POST, value = "/users/{userId}/groups")
     @ResponseBody
-    public Group create(@PathVariable String userId,
+    public ResponseEntity<?> create(@PathVariable String userId,
                         @RequestBody Group group) {
-        return groupServices.create(group, userId);
+        groupServices.create(group, userId);
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(method = PUT, value = "/users/{userId}/groups/{groupId}")
     @ResponseBody
-    public Group update(@PathVariable String userId,
+    public ResponseEntity<?> update(@PathVariable String userId,
                         @PathVariable String groupId,
                         @RequestBody Group groupUpdater) {
-        return groupServices.update(userId, groupId, groupUpdater);
+        groupServices.update(userId, groupId, groupUpdater);
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(method = DELETE, value = "/users/{userId}/groups/{groupId}")
     @ResponseBody
-    public Group remove(@PathVariable String userId,
-                        @PathVariable String groupId) {
-        return groupServices.remove(userId, groupId);
+    public ResponseEntity<?> remove(@PathVariable String userId,
+                                         @PathVariable String groupId) {
+        groupServices.remove(userId, groupId);
+        return ResponseEntity.ok().build();
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> exceptionHandler(Exception exception, WebRequest request) {
+    public ResponseEntity<String> exceptionHandler(Exception exception) {
 
         if (exception instanceof NotFoundObjectException) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

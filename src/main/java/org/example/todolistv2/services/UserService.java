@@ -16,15 +16,15 @@ public class UserService {
     @Autowired
     private GroupService groupServices;
 
-    public User create(User newUser) {
+    public Object create(User newUser) {
         if (newUser == null || newUser.getId() != null || exist(newUser.getId())) {
             throw new BadRequestException();
         }
         userRepository.insert(newUser);
-        return newUser;
+        return null;
     }
 
-    public User update(String userId, User newUserInfo) {
+    public void update(String userId, User newUserInfo) {
         if (newUserInfo == null) {
             throw new BadRequestException();
         }
@@ -35,17 +35,15 @@ public class UserService {
         if (newUserInfo.getFullName() != null) {
             oldUser.setFullName(newUserInfo.getFullName());
         }
-        return oldUser;
     }
 
-    public User remove(String userId) {
+    public void remove(String userId) {
         User removeUser = userRepository.findUserById(userId);
         if (removeUser == null) {
             throw new NotFoundObjectException();
         }
         groupServices.removeByUserId(userId);
         userRepository.delete(removeUser);
-        return removeUser;
     }
 
     public List<User> found() {
