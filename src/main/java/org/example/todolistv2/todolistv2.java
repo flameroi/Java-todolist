@@ -20,7 +20,6 @@ public class todolistv2 {
     public MongoTemplate mongoTemplate(MongoDatabaseFactory mongoDbFactory, MongoMappingContext mongoMappingContext) {
         MappingMongoConverter converter = new MappingMongoConverter(new DefaultDbRefResolver(mongoDbFactory), mongoMappingContext);
         converter.setTypeMapper(new DefaultMongoTypeMapper(null));
-        MongoTemplate mongoTemplate = new MongoTemplate(mongoDbFactory, converter);
-        return mongoTemplate;
+        return new MongoTemplate(mongoDbFactory, converter);
     }
 }
