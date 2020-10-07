@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -40,12 +41,13 @@ class UserServiceTest {
 
         assertTrue(userService.create(user));
         assertThrows(BadRequestException.class, () -> userService.create(null));
+
+        verify(userRepository, times(1)).insert(any(User.class));
     }
 
     @DisplayName("UserUpdate")
     @Test
     void update() {
-        //Init
         String preparedUserId = "ad2134";
         String preparedUserFullName = "justName";
 
@@ -54,7 +56,6 @@ class UserServiceTest {
         preparedMockUser.setFullName(preparedUserFullName);
 
         User preparedSentUser = new User();
-
 
         when(userRepository.findUserById(anyString())).thenReturn(null);
         when(userRepository.findUserById(preparedUserId)).thenReturn(preparedMockUser);
@@ -66,6 +67,8 @@ class UserServiceTest {
         assertTrue(userService.update(preparedUserId, preparedSentUser));
 
         assertThrows(NotFoundObjectException.class, () -> userService.update("123", preparedSentUser));
+
+        verify(userRepository, times(1)).save(any(User.class));
     }
 
     @DisplayName("UserRemove")
@@ -81,6 +84,8 @@ class UserServiceTest {
         assertTrue(userService.remove(preparedUserId));
         assertThrows(NotFoundObjectException.class, () -> userService.remove("123"));
         assertThrows(NotFoundObjectException.class, () -> userService.remove(null));
+
+        verify(userRepository, times(1)).delete(any());
     }
 
     @DisplayName("UserFind")
@@ -95,7 +100,6 @@ class UserServiceTest {
 
         when(userRepository.findAll()).thenReturn(emptyUserList);
         assertThrows(NotFoundObjectException.class, () -> userService.find());
-
         when(userRepository.findAll()).thenReturn(notEmptyUsersList);
         assertEquals(notEmptyUsersList, userService.find());
     }
