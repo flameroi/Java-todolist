@@ -25,6 +25,6 @@ public class User {
 
     @Override
     public String toString() {
-        return String.format("Имя:" + fullName + " id:" + id);
+        return "Имя:" + fullName + " id:" + id;
     }
 }
