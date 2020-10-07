@@ -16,37 +16,40 @@ public class UserService {
     @Autowired
     private GroupService groupServices;
 
-    public Object create(User newUser) {
+    public boolean create(User newUser) {
         if (newUser == null || newUser.getId() != null || exist(newUser.getId())) {
             throw new BadRequestException();
         }
         userRepository.insert(newUser);
-        return null;
+
+        return true;
     }
 
-    public void update(String userId, User newUserInfo) {
-        if (newUserInfo == null) {
+    public boolean update(String userId, User newUserInfo) {
+        if (newUserInfo == null || newUserInfo.getFullName() == null) {
             throw new BadRequestException();
         }
         User oldUser = userRepository.findUserById(userId);
         if (oldUser == null) {
             throw new NotFoundObjectException();
         }
-        if (newUserInfo.getFullName() != null) {
-            oldUser.setFullName(newUserInfo.getFullName());
-        }
+        oldUser.setFullName(newUserInfo.getFullName());
+        userRepository.save(oldUser);
+        return true;
     }
 
-    public void remove(String userId) {
+    public boolean remove(String userId) {
         User removeUser = userRepository.findUserById(userId);
         if (removeUser == null) {
             throw new NotFoundObjectException();
         }
         groupServices.removeByUserId(userId);
         userRepository.delete(removeUser);
+
+        return true;
     }
 
-    public List<User> found() {
+    public List<User> find() {
         List<User> userList = userRepository.findAll();
         if (userList.isEmpty()) {
             throw new NotFoundObjectException();

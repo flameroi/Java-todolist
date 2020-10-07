@@ -21,7 +21,7 @@ public class UserController {
     @RequestMapping(method = GET, value = "/users")
     @ResponseBody
     public List<User> userList() {
-        return userServices.found();
+        return userServices.find();
     }
 
     @RequestMapping(method = GET, value = "/users/{userId}")
