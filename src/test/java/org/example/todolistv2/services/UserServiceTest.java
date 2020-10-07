@@ -2,17 +2,27 @@ package org.example.todolistv2.services;
 
 import org.example.todolistv2.entity.User;
 import org.example.todolistv2.exceptions.BadRequestException;
+import org.example.todolistv2.exceptions.NotFoundObjectException;
 import org.example.todolistv2.mongotemplates.UserRepository;
-import org.junit.Assert;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(SpringRunner.class)
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 class UserServiceTest {
     @Autowired
@@ -22,23 +32,87 @@ class UserServiceTest {
     @MockBean
     private GroupService groupServices;
 
-    @DisplayName("UserCreateTest")
+    @DisplayName("UserCreate")
     @Test
-    void createTest() {
+    void create() {
         User user = new User();
         user.setFullName("Josh");
-        Assert.assertNull(userService.create(user));
 
-        //Assert.assertEquals(user, userService.create(user));
+        assertTrue(userService.create(user));
+        assertThrows(BadRequestException.class, () -> userService.create(null));
     }
 
-    @DisplayName("UserCreateFailTest ╯°□°）╯")
+    @DisplayName("UserUpdate")
     @Test
-    public void createFailTest() {
-        User user = null;
-        Assert.assertThrows(BadRequestException.class, () -> userService.create(user));
+    void update() {
+        //Init
+        String preparedUserId = "ad2134";
+        String preparedUserFullName = "justName";
+
+        User preparedMockUser = new User();
+        preparedMockUser.setId(preparedUserId);
+        preparedMockUser.setFullName(preparedUserFullName);
+
+        User preparedSentUser = new User();
+
+
+        when(userRepository.findUserById(anyString())).thenReturn(null);
+        when(userRepository.findUserById(preparedUserId)).thenReturn(preparedMockUser);
+
+        assertThrows(BadRequestException.class, () -> userService.update(preparedUserId, null));
+        assertThrows(BadRequestException.class, () -> userService.update(preparedUserId, preparedSentUser));
+
+        preparedSentUser.setFullName("name");
+        assertTrue(userService.update(preparedUserId, preparedSentUser));
+
+        assertThrows(NotFoundObjectException.class, () -> userService.update("123", preparedSentUser));
     }
 
-    //@Test
+    @DisplayName("UserRemove")
+    @Test
+    void remove() {
+        String preparedUserId = "ad2134";
+        User preparedMockUser = new User();
+        preparedMockUser.setId(preparedUserId);
 
+        when(userRepository.findUserById(anyString())).thenReturn(null);
+        when(userRepository.findUserById(preparedUserId)).thenReturn(preparedMockUser);
+
+        assertTrue(userService.remove(preparedUserId));
+        assertThrows(NotFoundObjectException.class, () -> userService.remove("123"));
+        assertThrows(NotFoundObjectException.class, () -> userService.remove(null));
+    }
+
+    @DisplayName("UserFind")
+    @Test
+    void find() {
+        String preparedUserId = "ad2134";
+        User preparedMockUser = new User();
+        preparedMockUser.setId(preparedUserId);
+        List<User> notEmptyUsersList = new ArrayList<>();
+        notEmptyUsersList.add(preparedMockUser);
+        List<User> emptyUserList = new ArrayList<>();
+
+        when(userRepository.findAll()).thenReturn(emptyUserList);
+        assertThrows(NotFoundObjectException.class, () -> userService.find());
+
+        when(userRepository.findAll()).thenReturn(notEmptyUsersList);
+        assertEquals(notEmptyUsersList, userService.find());
+    }
+
+    @DisplayName("UserGetInfo")
+    @Test
+    void getInfo() {
+        //Init
+        String preparedUserId = "ad2134";
+        User preparedMockUser = new User();
+        preparedMockUser.setId(preparedUserId);
+
+        when(userRepository.findUserById(anyString())).thenReturn(null);
+        when(userRepository.findUserById(preparedUserId)).thenReturn(preparedMockUser);
+
+        assertEquals(preparedMockUser, userService.getInfo(preparedUserId));
+        assertThrows(NotFoundObjectException.class, () -> userService.getInfo("123"));
+        assertThrows(NotFoundObjectException.class, () -> userService.getInfo(null));
+    }
 }
