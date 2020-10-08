@@ -89,7 +89,7 @@ public class ItemService {
         }
         return itemInfo;
     }
-    //Гит check
+
     public boolean update(String userId, String groupId, String itemId, Item updItem) {
         if (updItem == null) {
             throw new BadRequestException();
