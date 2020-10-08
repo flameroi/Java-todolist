@@ -20,17 +20,21 @@ public class GroupService {
     @Autowired
     private ItemService itemServices;
 
-    public void create(Group newGroup, String userId) {
-        if (!userServices.exist(userId) && newGroup == null) {
+    public boolean create(String userId, Group newGroup) {
+        if (userServices.notExist(userId)) {
             throw new NotFoundOwnerException();
         }
-        if (newGroup == null) {
+        if (newGroup == null || newGroup.getName() == null) {
             throw new BadRequestException();
         }
+        if (!userId.equals(newGroup.getUserId())){
+            throw new NoAccessException();
+        }
         groupRepository.insert(newGroup);
+        return true;
     }
 
-    public void update(String userId, String groupId, Group updGroup) {
+    public boolean update(String userId, String groupId, Group updGroup) {
         if (updGroup == null) {
             throw new BadRequestException();
         }
@@ -39,7 +43,7 @@ public class GroupService {
             throw new NotFoundObjectException();
         }
         if (updGroup.getUserId() != null  && !userId.equals(updGroup.getUserId())) {
-            if (userServices.exist(updGroup.getUserId())) {
+            if (userServices.notExist(updGroup.getUserId())) {
                 throw new BadRequestException();
             }
             oldGroup.setUserId(updGroup.getUserId());
@@ -48,20 +52,23 @@ public class GroupService {
             oldGroup.setName(updGroup.getName());
         }
         groupRepository.save(oldGroup);
+        return true;
     }
 
-    public void remove(String userId, String groupId) {
+    public boolean remove(String userId, String groupId) {
         Group removingGroup = groupRepository.findGroupById(groupId);
         if (removingGroup == null) {
             throw new NotFoundObjectException();
         }
-        if (!removingGroup.getUserId().equals(userId)){
+        if (!userId.equals(removingGroup.getUserId())){
             throw new NoAccessException();
         }
         groupRepository.delete(removingGroup);
+        itemServices.removeByGroupId(groupId);
+        return true;
     }
 
-    public List<Group> found() {
+    public List<Group> find() {
         List<Group> groupList = groupRepository.findAll();
         if(groupList.isEmpty()) {
             throw new NotFoundObjectException();
@@ -69,7 +76,7 @@ public class GroupService {
         return groupList;
     }
 
-    public List<Group> found(String userId) {
+    public List<Group> find(String userId) {
         List<Group> groupList = groupRepository.findGroupByUserId(userId);
         if (groupList == null) {
             throw new NotFoundObjectException();
@@ -77,18 +84,22 @@ public class GroupService {
         return groupList;
     }
 
-    public Group found(String userId, String groupId) {
+    public Group getInfo(String userId, String groupId) {
         Group group = groupRepository.findGroupById(groupId);
         if (group == null) {
             throw new NotFoundObjectException();
         }
-        if (!userServices.exist(userId) || !group.getId().equals(groupId)) {
+
+        if (userServices.notExist(userId) || !userId.equals(group.getUserId())) {
             throw new NoAccessException();
         }
         return group;
     }
 
     void removeByUserId(String groupId) {
+        if (groupId == null) {
+            throw new NullPointerException();
+        }
         List<Group> removeGroups = groupRepository.findGroupByUserId(groupId);
         if (removeGroups != null) {
             for (Group group : removeGroups) {
@@ -98,9 +109,12 @@ public class GroupService {
         }
     }
 
-    boolean hasAccess(String userId, String groupId){
+    boolean hasNotAccess(String userId, String groupId){
+        if (groupId == null && userId == null) {
+            throw new NullPointerException();
+        }
         Group group = groupRepository.findGroupById(groupId);
-        return group == null || !group.getUserId().equals(userId);
+        return group == null || !userId.equals(group.getUserId());
     }
 
     boolean notExist(String group_id) {

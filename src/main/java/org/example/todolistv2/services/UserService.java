@@ -17,7 +17,9 @@ public class UserService {
     private GroupService groupServices;
 
     public boolean create(User newUser) {
-        if (newUser == null || newUser.getId() != null || exist(newUser.getId()) || newUser.getFullName() == null) {
+        if (newUser == null ||
+                (newUser.getId() != null && notExist(newUser.getId())) ||
+                newUser.getFullName() == null) {
             throw new BadRequestException();
         }
         userRepository.insert(newUser);
@@ -45,7 +47,6 @@ public class UserService {
         }
         groupServices.removeByUserId(userId);
         userRepository.delete(removeUser);
-
         return true;
     }
 
@@ -65,7 +66,7 @@ public class UserService {
         return returnUser;
     }
 
-    boolean exist(String user_id) {
-        return userRepository.findUserById(user_id) != null;
+    boolean notExist(String user_id) {
+        return userRepository.findUserById(user_id) == null;
     }
 }

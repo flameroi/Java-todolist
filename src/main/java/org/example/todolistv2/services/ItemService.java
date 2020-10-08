@@ -35,7 +35,7 @@ public class ItemService {
         if (newItem.getActivity() == null) {
             newItem.setActivity(true);
         }
-        if (groupServices.hasAccess(userId, groupId) || !newItem.getGroupId().equals(groupId)) {
+        if (groupServices.hasNotAccess(userId, groupId) || !newItem.getGroupId().equals(groupId)) {
             throw new NoAccessException();
         }
         itemRepository.insert(newItem);
@@ -47,7 +47,7 @@ public class ItemService {
         if (removingItem == null) {
             throw new NotFoundObjectException();
         }
-        if (groupServices.hasAccess(userId, groupId)
+        if (groupServices.hasNotAccess(userId, groupId)
                 || !groupId.equals(removingItem.getGroupId())) {
             throw new NoAccessException();
         }
@@ -70,7 +70,7 @@ public class ItemService {
         if (itemList == null) {
             throw new NotFoundObjectException();
         }
-        if (groupServices.hasAccess(userId, groupId)) {
+        if (groupServices.hasNotAccess(userId, groupId)) {
             throw new NoAccessException();
         }
         return itemList;
@@ -84,7 +84,7 @@ public class ItemService {
         if (itemInfo == null) {
             throw new NotFoundObjectException();
         }
-        if (groupServices.hasAccess(userId, groupId) || !groupId.equals(itemInfo.getGroupId())) {
+        if (groupServices.hasNotAccess(userId, groupId) || !groupId.equals(itemInfo.getGroupId())) {
             throw new NoAccessException();
         }
         return itemInfo;
@@ -101,7 +101,7 @@ public class ItemService {
         if (updItem.getId() != null && !updItem.getId().equals(oldItem.getId())) {
             throw new BadRequestException();
         }
-        if (groupServices.hasAccess(userId, groupId)) {
+        if (groupServices.hasNotAccess(userId, groupId)) {
             throw new NoAccessException();
         }
         if (updItem.getGroupId() != null && !groupId.equals(updItem.getGroupId())) {

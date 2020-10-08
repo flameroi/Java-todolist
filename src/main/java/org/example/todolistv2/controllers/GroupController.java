@@ -20,21 +20,21 @@ public class GroupController {
     @RequestMapping(method = GET, value = "/users/{userId}/groups")
     @ResponseBody
     public List<Group> found(@PathVariable String userId) {
-        return groupServices.found(userId);
+        return groupServices.find(userId);
     }
 
     @RequestMapping(method = GET, value = "/users/{userId}/groups/{groupId}")
     @ResponseBody
     public Group found(@PathVariable String userId,
                        @PathVariable String groupId) {
-        return groupServices.found(userId, groupId);
+        return groupServices.getInfo(userId, groupId);
     }
 
     @RequestMapping(method = POST, value = "/users/{userId}/groups")
     @ResponseBody
     public ResponseEntity<?> create(@PathVariable String userId,
                         @RequestBody Group group) {
-        groupServices.create(group, userId);
+        groupServices.create(userId, group);
         return ResponseEntity.ok().build();
     }
 

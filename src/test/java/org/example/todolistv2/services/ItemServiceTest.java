@@ -54,7 +54,6 @@ class ItemServiceTest {
         verify(itemRepository, times(1)).insert(any(Item.class));
     }
 
-
     @DisplayName("ItemRemove")
     @Test
     void remove() {
@@ -66,7 +65,7 @@ class ItemServiceTest {
         returnedMockItem.setId(preparedItemId);
 
         //Проверка пустого юзера
-        assertThrows(NotFoundObjectException.class, () -> itemService.remove(userId, groupId,null));
+        assertThrows(NotFoundObjectException.class, () -> itemService.remove(userId, groupId, null));
         //Проверка несуществующего юзера
         when(itemRepository.findItemById(anyString())).thenReturn(null);
         assertThrows(NotFoundObjectException.class, () -> itemService.remove(userId, groupId, "123"));
@@ -80,7 +79,6 @@ class ItemServiceTest {
 
         verify(itemRepository, times(1)).delete(any());
     }
-
 
     @DisplayName("ItemsFindByGroup")
     @Test
@@ -135,18 +133,18 @@ class ItemServiceTest {
         when(itemRepository.findItemById(itemId)).thenReturn(returnedMockItem);
 
 
-        assertThrows(BadRequestException.class, () -> itemService.update(userId, "anotherGroupId", "anotherItemId",null));
+        assertThrows(BadRequestException.class, () -> itemService.update(userId, "anotherGroupId", "anotherItemId", null));
         assertThrows(NotFoundObjectException.class, () -> itemService.update(userId, groupId, "anotherItemId", sendingMockItem));
         //Если отправить пустой Item то, следовательно, ничего и не обновится
         assertTrue(itemService.update(userId, "anotherGroupId", itemId, sendingMockItem));
         //Если Id Item'a не совпадает со старым, выдаем BadRequestException, т.к. менять id так себе идея
         sendingMockItem.setId("notEquals");
-        assertThrows(BadRequestException.class, () -> itemService.update(userId, groupId, itemId,sendingMockItem));
+        assertThrows(BadRequestException.class, () -> itemService.update(userId, groupId, itemId, sendingMockItem));
         sendingMockItem.setId(itemId);
         sendingMockItem.setGroupId("notEquals");
         sendingMockItem.setName("notEquals");
         sendingMockItem.setActivity(false);
-        assertTrue(itemService.update(userId, groupId, itemId,sendingMockItem));
+        assertTrue(itemService.update(userId, groupId, itemId, sendingMockItem));
 
         verify(itemRepository, times(2)).save(any());
     }
