@@ -45,7 +45,6 @@ class GroupServiceTest {
         Group group = new Group();
         assertThrows(BadRequestException.class, () -> groupService.create(userId, null));
         assertThrows(BadRequestException.class, () -> groupService.create(userId, group));
-        //assertTrue(itemService.create(userId, groupId, item));
         group.setName("randomName");
         assertThrows(NoAccessException.class, () -> groupService.create(userId, group));
         group.setUserId(userId);
@@ -58,7 +57,6 @@ class GroupServiceTest {
     void update() {
         String userId = "randomUserId";
         String groupId = "randomGroupId";
-        String groupname = "Name";
         Group gettingGroup = new Group();
         gettingGroup.setId(groupId);
         gettingGroup.setUserId(userId);
