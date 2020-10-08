@@ -103,7 +103,7 @@ public class GroupService {
         return group == null || !group.getUserId().equals(userId);
     }
 
-    boolean exist(String group_id) {
+    boolean notExist(String group_id) {
         return groupRepository.findGroupById(group_id) == null;
     }
 }

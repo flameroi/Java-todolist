@@ -29,26 +29,28 @@ class UserServiceTest {
     @Autowired
     private UserService userService;
     @MockBean
-    private UserRepository userRepository;
+    private GroupService groupServices; //Вызывается проверка в userUpdate
     @MockBean
-    private GroupService groupServices;
+    private UserRepository userRepository;
+
 
     @DisplayName("UserCreate")
     @Test
     void create() {
         User user = new User();
-        user.setFullName("Josh");
 
-        assertTrue(userService.create(user));
         assertThrows(BadRequestException.class, () -> userService.create(null));
+        assertThrows(BadRequestException.class, () -> userService.create(user));
 
+        user.setFullName("Josh");
+        assertTrue(userService.create(user));
         verify(userRepository, times(1)).insert(any(User.class));
     }
 
     @DisplayName("UserUpdate")
     @Test
     void update() {
-        String preparedUserId = "ad2134";
+        String preparedUserId = "randomUserId";
         String preparedUserFullName = "justName";
 
         User preparedMockUser = new User();
@@ -63,10 +65,10 @@ class UserServiceTest {
         assertThrows(BadRequestException.class, () -> userService.update(preparedUserId, null));
         assertThrows(BadRequestException.class, () -> userService.update(preparedUserId, preparedSentUser));
 
-        preparedSentUser.setFullName("name");
+        preparedSentUser.setFullName("NotJustName");
         assertTrue(userService.update(preparedUserId, preparedSentUser));
 
-        assertThrows(NotFoundObjectException.class, () -> userService.update("123", preparedSentUser));
+        assertThrows(NotFoundObjectException.class, () -> userService.update("IdNotEqualPreparedUserId", preparedSentUser));
 
         verify(userRepository, times(1)).save(any(User.class));
     }
@@ -74,16 +76,16 @@ class UserServiceTest {
     @DisplayName("UserRemove")
     @Test
     void remove() {
-        String preparedUserId = "ad2134";
+        String preparedUserId = "randomUserId";
         User preparedMockUser = new User();
         preparedMockUser.setId(preparedUserId);
 
         when(userRepository.findUserById(anyString())).thenReturn(null);
         when(userRepository.findUserById(preparedUserId)).thenReturn(preparedMockUser);
 
-        assertTrue(userService.remove(preparedUserId));
         assertThrows(NotFoundObjectException.class, () -> userService.remove("123"));
         assertThrows(NotFoundObjectException.class, () -> userService.remove(null));
+        assertTrue(userService.remove(preparedUserId));
 
         verify(userRepository, times(1)).delete(any());
     }
@@ -91,7 +93,7 @@ class UserServiceTest {
     @DisplayName("UserFind")
     @Test
     void find() {
-        String preparedUserId = "ad2134";
+        String preparedUserId = "randomUserId";
         User preparedMockUser = new User();
         preparedMockUser.setId(preparedUserId);
         List<User> notEmptyUsersList = new ArrayList<>();
@@ -108,7 +110,7 @@ class UserServiceTest {
     @Test
     void getInfo() {
         //Init
-        String preparedUserId = "ad2134";
+        String preparedUserId = "randomUserId";
         User preparedMockUser = new User();
         preparedMockUser.setId(preparedUserId);
 

@@ -19,34 +19,44 @@ public class ItemService {
     @Autowired
     private GroupService groupServices;
 
-    public void create(String userId, String groupId , Item newItem) {
-        if (groupServices.exist(groupId)) {
+    public boolean create(String userId, String groupId, Item newItem) {
+        if (groupServices.notExist(groupId)) {
             throw new NotFoundOwnerException();
         }
-        if (newItem.getGroupId() == null || newItem.getName() == null) {
+        if (newItem == null) {
+            throw new BadRequestException();
+        }
+        if (newItem.getGroupId() == null) {
+            newItem.setGroupId(groupId);
+        }
+        if (!groupId.equals(newItem.getGroupId()) || newItem.getName() == null) {
             throw new BadRequestException();
         }
         if (newItem.getActivity() == null) {
             newItem.setActivity(true);
         }
-        if(groupServices.hasAccess(userId, groupId) || !newItem.getGroupId().equals(groupId)){
-            throw  new NoAccessException();
+        if (groupServices.hasAccess(userId, groupId) || !newItem.getGroupId().equals(groupId)) {
+            throw new NoAccessException();
         }
+        itemRepository.insert(newItem);
+        return true;
     }
 
-    public void remove(String  userId, String groupId, String itemId) {
+    public boolean remove(String userId, String groupId, String itemId) {
         Item removingItem = itemRepository.findItemById(itemId);
         if (removingItem == null) {
             throw new NotFoundObjectException();
         }
-        if(groupServices.hasAccess(userId, groupId) || !removingItem.getGroupId().equals(groupId)){
-            throw  new NoAccessException();
+        if (groupServices.hasAccess(userId, groupId)
+                || !groupId.equals(removingItem.getGroupId())) {
+            throw new NoAccessException();
         }
         itemRepository.delete(removingItem);
+        return true;
     }
 
 
-    public List<Item> found() {
+    public List<Item> find() {
         List<Item> itemList = itemRepository.findAll();
         if (itemList.isEmpty()) {
             throw new NotFoundObjectException();
@@ -55,32 +65,32 @@ public class ItemService {
     }
 
 
-    public List<Item> found(String userId, String groupId) {
+    public List<Item> find(String userId, String groupId) {
         List<Item> itemList = itemRepository.findItemsByGroupId(groupId);
         if (itemList == null) {
             throw new NotFoundObjectException();
         }
-        if(groupServices.hasAccess(userId, groupId)){
-            throw  new NoAccessException();
+        if (groupServices.hasAccess(userId, groupId)) {
+            throw new NoAccessException();
         }
         return itemList;
     }
 
     public Item getInfo(String userId, String groupId, String item_id) {
-        if (groupServices.exist(groupId)) {
+        if (groupServices.notExist(groupId)) {
             throw new NotFoundOwnerException();
         }
         Item itemInfo = itemRepository.findItemById(item_id);
         if (itemInfo == null) {
             throw new NotFoundObjectException();
         }
-        if(groupServices.hasAccess(userId, groupId) || !itemInfo.getGroupId().equals(groupId)){
-            throw  new NoAccessException();
+        if (groupServices.hasAccess(userId, groupId) || !groupId.equals(itemInfo.getGroupId())) {
+            throw new NoAccessException();
         }
         return itemInfo;
     }
 
-    public void update(String userId, String groupId, String itemId, Item updItem) {
+    public boolean update(String userId, String groupId, String itemId, Item updItem) {
         if (updItem == null) {
             throw new BadRequestException();
         }
@@ -88,15 +98,17 @@ public class ItemService {
         if (oldItem == null) {
             throw new NotFoundObjectException();
         }
-        if(groupServices.hasAccess(userId, groupId)){
-            throw  new NoAccessException();
+        if (updItem.getId() != null && !updItem.getId().equals(oldItem.getId())) {
+            throw new BadRequestException();
+        }
+        if (groupServices.hasAccess(userId, groupId)) {
+            throw new NoAccessException();
         }
         if (updItem.getGroupId() != null && !groupId.equals(updItem.getGroupId())) {
-            if (groupServices.exist(updItem.getGroupId())) {
-                oldItem.setGroupId(updItem.getGroupId());
-            } else {
+            if (groupServices.notExist(updItem.getGroupId())) {
                 throw new NotFoundOwnerException();
             }
+            oldItem.setGroupId(updItem.getGroupId());
         }
         if (updItem.getName() != null) {
             oldItem.setName(updItem.getName());
@@ -104,12 +116,20 @@ public class ItemService {
         if (updItem.getActivity() != null) {
             oldItem.setActivity(updItem.getActivity());
         }
+
+        itemRepository.save(oldItem);
+        return true;
     }
 
-    public void removeByGroupId(String groupId) {
+    public boolean removeByGroupId(String groupId) {
+        if (groupId == null) {
+            throw new NullPointerException();
+        }
         List<Item> removeItem = itemRepository.findItemsByGroupId(groupId);
         if (removeItem != null) {
             itemRepository.deleteAll(removeItem);
+            return true;
         }
+        return false;
     }
 }

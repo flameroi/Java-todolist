@@ -17,7 +17,7 @@ public class UserService {
     private GroupService groupServices;
 
     public boolean create(User newUser) {
-        if (newUser == null || newUser.getId() != null || exist(newUser.getId())) {
+        if (newUser == null || newUser.getId() != null || exist(newUser.getId()) || newUser.getFullName() == null) {
             throw new BadRequestException();
         }
         userRepository.insert(newUser);

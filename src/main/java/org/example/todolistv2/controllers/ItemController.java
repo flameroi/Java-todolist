@@ -23,7 +23,7 @@ public class ItemController {
     @ResponseBody
     public List<Item> found(@PathVariable String userId,
                             @PathVariable String groupId) {
-        return itemServices.found(userId, groupId);
+        return itemServices.find(userId, groupId);
     }
 
     @RequestMapping(method = GET, value = "/users/{userId}/groups/{groupId}/items/{itemId}}")
