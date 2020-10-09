@@ -131,13 +131,12 @@ class ItemServiceTest {
 
         when(itemRepository.findItemById(anyString())).thenReturn(null);
         when(itemRepository.findItemById(itemId)).thenReturn(returnedMockItem);
+        when(groupService.notExist(anyString())).thenReturn(true);
 
 
-        assertThrows(BadRequestException.class, () -> itemService.update(userId, "anotherGroupId", "anotherItemId", null));
         assertThrows(NotFoundObjectException.class, () -> itemService.update(userId, groupId, "anotherItemId", sendingMockItem));
-        //Если отправить пустой Item то, следовательно, ничего и не обновится
-        assertTrue(itemService.update(userId, "anotherGroupId", itemId, sendingMockItem));
-        //Если Id Item'a не совпадает со старым, выдаем BadRequestException, т.к. менять id так себе идея
+        assertThrows(BadRequestException.class, () -> itemService.update(userId, groupId, itemId, null));
+        assertThrows(BadRequestException.class, () -> itemService.update(userId, groupId, itemId, sendingMockItem));
         sendingMockItem.setId("notEquals");
         assertThrows(BadRequestException.class, () -> itemService.update(userId, groupId, itemId, sendingMockItem));
         sendingMockItem.setId(itemId);
@@ -146,7 +145,7 @@ class ItemServiceTest {
         sendingMockItem.setActivity(false);
         assertTrue(itemService.update(userId, groupId, itemId, sendingMockItem));
 
-        verify(itemRepository, times(2)).save(any());
+        verify(itemRepository, times(1)).save(any());
     }
 
     @DisplayName("Поверка внутренней функции - removeByGroupId")
@@ -163,6 +162,6 @@ class ItemServiceTest {
         when(itemRepository.findItemsByGroupId(groupId)).thenReturn(items);
         assertTrue(itemService.removeByGroupId(groupId));
 
-        verify(itemRepository, times(2)).findItemsByGroupId(any());
+        verify(itemRepository, times(1)).deleteAll(any());
     }
 }

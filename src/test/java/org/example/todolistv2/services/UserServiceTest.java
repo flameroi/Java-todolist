@@ -29,9 +29,9 @@ class UserServiceTest {
     @Autowired
     private UserService userService;
     @MockBean
-    private GroupService groupServices; //Вызывается проверка в userUpdate
-    @MockBean
     private UserRepository userRepository;
+    @MockBean
+    private GroupService groupServices;
 
 
     @DisplayName("UserCreate")
@@ -60,7 +60,9 @@ class UserServiceTest {
         User preparedSentUser = new User();
 
         when(userRepository.findUserById(anyString())).thenReturn(null);
-        when(userRepository.findUserById(preparedUserId)).thenReturn(preparedMockUser);
+        when(userRepository.findUserById(anyString())).thenReturn(null);
+        when(groupServices.notExist(anyString())).thenReturn(true);
+
 
         assertThrows(BadRequestException.class, () -> userService.update(preparedUserId, null));
         assertThrows(BadRequestException.class, () -> userService.update(preparedUserId, preparedSentUser));

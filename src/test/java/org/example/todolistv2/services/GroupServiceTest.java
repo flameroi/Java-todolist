@@ -32,11 +32,6 @@ class GroupServiceTest {
     private ItemService itemService;
     @MockBean
     private UserService userService;
-    /* Group
-    * private String id;
-    * private String name;
-    * private String userId;
-    */
 
     @DisplayName("GroupCreating")
     @Test
@@ -63,6 +58,7 @@ class GroupServiceTest {
         Group sendingGroup = new Group();
 
         when(groupRepository.findGroupById(any())).thenReturn(null);
+        when(userService.notExist(anyString())).thenReturn(true);
         when(groupRepository.findGroupById(groupId)).thenReturn(gettingGroup);
 
         assertThrows(BadRequestException.class, ()-> groupService.update(userId, groupId, null));
@@ -81,6 +77,7 @@ class GroupServiceTest {
 
         when(groupRepository.findGroupById(any())).thenReturn(null);
         when(groupRepository.findGroupById(groupId)).thenReturn(gettingGroup);
+        when(itemService.removeByGroupId(anyString())).thenReturn(true);
 
         assertThrows(NotFoundObjectException.class, ()-> groupService.remove(userId, "notEqualGroupId"));
         assertThrows(NoAccessException.class, ()-> groupService.remove(userId, groupId));
