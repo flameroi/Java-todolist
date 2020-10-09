@@ -91,14 +91,14 @@ public class ItemService {
     }
 
     public boolean update(String userId, String groupId, String itemId, Item updItem) {
-        if (updItem == null) {
-            throw new BadRequestException();
-        }
+
         Item oldItem = itemRepository.findItemById(itemId);
         if (oldItem == null) {
             throw new NotFoundObjectException();
         }
-        if (updItem.getId() != null && !updItem.getId().equals(oldItem.getId())) {
+        if (    updItem == null ||
+                updItem.nullValues() ||
+                (updItem.getId() != null && !updItem.getId().equals(oldItem.getId()))) {
             throw new BadRequestException();
         }
         if (groupServices.hasNotAccess(userId, groupId)) {

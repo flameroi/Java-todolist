@@ -43,6 +43,13 @@ public class Item {
 
     @Override
     public String toString() {
-        return String.format("Group: " + groupId + " id: " + id + " name: " + name);
+        return "Group: " + groupId + " id: " + id + " name: " + name;
+    }
+
+    public boolean nullValues(){
+        return  this.id == null &&
+                this.name == null &&
+                this.groupId == null &&
+                this.activity == null;
     }
 }
