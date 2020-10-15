@@ -13,12 +13,16 @@ import java.util.List;
 
 @Service
 public class GroupService {
+    private final GroupRepository groupRepository;
+    private final UserService userServices;
+    private final ItemService itemServices;
+
     @Autowired
-    private GroupRepository groupRepository;
-    @Autowired
-    private UserService userServices;
-    @Autowired
-    private ItemService itemServices;
+    public GroupService(GroupRepository groupRepository, UserService userService, ItemService itemService){
+        this.groupRepository = groupRepository;
+        this.userServices = userService;
+        this.itemServices = itemService;
+    }
 
     public boolean create(String userId, Group newGroup) {
         if (userServices.notExist(userId)) {

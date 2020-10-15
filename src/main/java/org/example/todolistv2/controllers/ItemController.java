@@ -5,7 +5,6 @@ import org.example.todolistv2.exceptions.BadRequestException;
 import org.example.todolistv2.exceptions.NotFoundObjectException;
 import org.example.todolistv2.exceptions.NotFoundOwnerException;
 import org.example.todolistv2.services.ItemService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,29 +15,28 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
 public class ItemController {
-    @Autowired
-    private ItemService itemServices;
+    ItemService itemServices;
 
     @RequestMapping(method = GET, value = "/users/{userId}/groups/{groupId}/items")
     @ResponseBody
-    public List<Item> found(@PathVariable String userId,
-                            @PathVariable String groupId) {
+    public List<Item> find(@PathVariable String userId,
+                           @PathVariable String groupId) {
         return itemServices.find(userId, groupId);
     }
 
     @RequestMapping(method = GET, value = "/users/{userId}/groups/{groupId}/items/{itemId}}")
     @ResponseBody
-    public Item found(@PathVariable String userId,
-                      @PathVariable String groupId,
-                      @PathVariable String itemId) {
+    public Item find(@PathVariable String userId,
+                     @PathVariable String groupId,
+                     @PathVariable String itemId) {
         return itemServices.getInfo(userId, groupId, itemId);
     }
 
     @RequestMapping(method = POST, value = "/users/{userId}/groups/{groupId}/items")
     @ResponseBody
     public ResponseEntity<?> addItem(@PathVariable String userId,
-                        @PathVariable String groupId,
-                        @RequestBody Item item) {
+                                     @PathVariable String groupId,
+                                     @RequestBody Item item) {
         itemServices.create(userId, groupId, item);
         return ResponseEntity.ok().build();
     }
@@ -46,9 +44,9 @@ public class ItemController {
     @RequestMapping(method = PUT, value = "/users/{userId}/groups/{groupId}/items/{itemId}")
     @ResponseBody
     public ResponseEntity<?> update(@PathVariable String userId,
-                                         @PathVariable String groupId,
-                                         @PathVariable String itemId,
-                                         @RequestBody Item itemUpd) {
+                                    @PathVariable String groupId,
+                                    @PathVariable String itemId,
+                                    @RequestBody Item itemUpd) {
         itemServices.update(userId, groupId, itemId, itemUpd);
         return ResponseEntity.ok().build();
     }
@@ -56,8 +54,8 @@ public class ItemController {
     @RequestMapping(method = DELETE, value = "/users/{userId}/groups/{groupId}/items/{itemId}")
     @ResponseBody
     public ResponseEntity<?> remove(@PathVariable String userId,
-                       @PathVariable String groupId,
-                       @PathVariable String itemId) {
+                                    @PathVariable String groupId,
+                                    @PathVariable String itemId) {
         itemServices.remove(userId, groupId, itemId);
         return ResponseEntity.ok().build();
     }

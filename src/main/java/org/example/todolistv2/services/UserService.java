@@ -11,10 +11,14 @@ import java.util.List;
 
 @Service
 public class UserService {
+    private final UserRepository userRepository;
+    private final GroupService groupService;
+
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private GroupService groupServices;
+    public UserService(UserRepository userRepository, GroupService groupService){
+        this.userRepository = userRepository;
+        this.groupService = groupService;
+    }
 
     public boolean create(User newUser) {
         if (newUser == null ||
@@ -45,7 +49,7 @@ public class UserService {
         if (removeUser == null) {
             throw new NotFoundObjectException();
         }
-        groupServices.removeByUserId(userId);
+        groupService.removeByUserId(userId);
         userRepository.delete(removeUser);
         return true;
     }

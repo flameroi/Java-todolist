@@ -19,20 +19,20 @@ public class GroupController {
 
     @RequestMapping(method = GET, value = "/users/{userId}/groups")
     @ResponseBody
-    public List<Group> found(@PathVariable String userId) {
+    public List<Group> find(@PathVariable String userId) {
         return groupServices.find(userId);
     }
 
     @RequestMapping(method = GET, value = "/users/{userId}/groups/{groupId}")
     @ResponseBody
-    public Group found(@PathVariable String userId,
+    public Group find(@PathVariable String userId,
                        @PathVariable String groupId) {
         return groupServices.getInfo(userId, groupId);
     }
 
     @RequestMapping(method = POST, value = "/users/{userId}/groups")
     @ResponseBody
-    public ResponseEntity<?> create(@PathVariable String userId,
+    public ResponseEntity<String> create(@PathVariable String userId,
                         @RequestBody Group group) {
         groupServices.create(userId, group);
         return ResponseEntity.ok().build();
@@ -40,7 +40,7 @@ public class GroupController {
 
     @RequestMapping(method = PUT, value = "/users/{userId}/groups/{groupId}")
     @ResponseBody
-    public ResponseEntity<?> update(@PathVariable String userId,
+    public ResponseEntity<String> update(@PathVariable String userId,
                         @PathVariable String groupId,
                         @RequestBody Group groupUpdater) {
         groupServices.update(userId, groupId, groupUpdater);
@@ -49,7 +49,7 @@ public class GroupController {
 
     @RequestMapping(method = DELETE, value = "/users/{userId}/groups/{groupId}")
     @ResponseBody
-    public ResponseEntity<?> remove(@PathVariable String userId,
+    public ResponseEntity<String> remove(@PathVariable String userId,
                                          @PathVariable String groupId) {
         groupServices.remove(userId, groupId);
         return ResponseEntity.ok().build();
