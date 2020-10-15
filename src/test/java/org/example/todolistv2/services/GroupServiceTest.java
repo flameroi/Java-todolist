@@ -5,7 +5,7 @@ import org.example.todolistv2.exceptions.BadRequestException;
 import org.example.todolistv2.exceptions.NoAccessException;
 import org.example.todolistv2.exceptions.NotFoundObjectException;
 import org.example.todolistv2.mongotemplates.GroupRepository;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +33,11 @@ class GroupServiceTest {
     @MockBean
     private UserService userService;
 
+    @BeforeAll
+    @Test
+    static void init(){
+    }
+
     @DisplayName("GroupCreating")
     @Test
     void create() {
@@ -58,12 +63,14 @@ class GroupServiceTest {
         Group sendingGroup = new Group();
 
         when(groupRepository.findGroupById(any())).thenReturn(null);
-        when(userService.notExist(anyString())).thenReturn(true);
+        when(userService.notExist(anyString())).thenReturn(false);
         when(groupRepository.findGroupById(groupId)).thenReturn(gettingGroup);
 
         assertThrows(BadRequestException.class, ()-> groupService.update(userId, groupId, null));
         assertThrows(NotFoundObjectException.class, ()-> groupService.update(userId, "notEqualsGroupId", sendingGroup));
         sendingGroup.setUserId("notEqualsUserId");
+        assertThrows(BadRequestException.class, ()-> groupService.update(userId, groupId, null));
+        sendingGroup.setUserId(userId);
         assertTrue(groupService.update(userId, groupId, sendingGroup));
         verify(groupRepository, times(1)).save(any(Group.class));
     }

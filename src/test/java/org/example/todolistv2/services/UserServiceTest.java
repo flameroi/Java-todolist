@@ -38,13 +38,21 @@ class UserServiceTest {
     @Test
     void create() {
         User user = new User();
-
-        assertThrows(BadRequestException.class, () -> userService.create(null));
-        assertThrows(BadRequestException.class, () -> userService.create(user));
-
         user.setFullName("Josh");
         assertTrue(userService.create(user));
         verify(userRepository, times(1)).insert(any(User.class));
+    }
+
+    @DisplayName("Создание null объекта")
+    void createTestWithNullUserObject() {
+        User user = new User();
+        assertThrows(BadRequestException.class, () -> userService.create(null));
+    }
+
+    @DisplayName("Создание объекта без заданного имени")
+    void createWithNullName() {
+        User user = new User();
+        assertThrows(BadRequestException.class, () -> userService.create(user));
     }
 
     @DisplayName("UserUpdate")
@@ -60,17 +68,17 @@ class UserServiceTest {
         User preparedSentUser = new User();
 
         when(userRepository.findUserById(anyString())).thenReturn(null);
-        when(userRepository.findUserById(anyString())).thenReturn(null);
+        when(userRepository.findUserById(preparedUserId)).thenReturn(preparedMockUser);
         when(groupServices.notExist(anyString())).thenReturn(true);
 
 
         assertThrows(BadRequestException.class, () -> userService.update(preparedUserId, null));
         assertThrows(BadRequestException.class, () -> userService.update(preparedUserId, preparedSentUser));
-
         preparedSentUser.setFullName("NotJustName");
+        assertThrows(NotFoundObjectException.class, () -> userService.update("IdNotEqualPreparedUserId", preparedSentUser));
+
         assertTrue(userService.update(preparedUserId, preparedSentUser));
 
-        assertThrows(NotFoundObjectException.class, () -> userService.update("IdNotEqualPreparedUserId", preparedSentUser));
 
         verify(userRepository, times(1)).save(any(User.class));
     }

@@ -131,7 +131,7 @@ class ItemServiceTest {
 
         when(itemRepository.findItemById(anyString())).thenReturn(null);
         when(itemRepository.findItemById(itemId)).thenReturn(returnedMockItem);
-        when(groupService.notExist(anyString())).thenReturn(true);
+        when(groupService.notExist(anyString())).thenReturn(false);
 
 
         assertThrows(NotFoundObjectException.class, () -> itemService.update(userId, groupId, "anotherItemId", sendingMockItem));
