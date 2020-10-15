@@ -46,8 +46,8 @@ public class Item {
         return "Group: " + groupId + " id: " + id + " name: " + name;
     }
 
-    public boolean nullValues(){
-        return  this.id == null &&
+    public boolean nullValues() {
+        return this.id == null &&
                 this.name == null &&
                 this.groupId == null &&
                 this.activity == null;
