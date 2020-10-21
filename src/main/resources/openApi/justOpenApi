@@ -34,9 +34,37 @@ paths:
         responses:
           200:
             description: Ок
+
     /user/{userId}:
-      put: {}
-      delete: {}
+      get:
+        description: Возвращает информацию о пользователе по id
+        summary: поиск пользователя по айди
+        operationId: getUserById
+        produces:
+          - application/json
+        consumes:
+          - application/json
+        responses:
+          200:
+            description: Ok
+      put:
+        description: Изменение
+        operationId: updateUserById
+        consumes:
+          - application/json
+        responses:
+
+          200:
+            description: Ok
+      delete:
+        description: Удаление
+        operationId: updateUserById
+        consumes:
+          - application/json
+        responses:
+          200:
+            description: Ok
+
     /user/{userId}/group:
       get: { }
       post: { }
