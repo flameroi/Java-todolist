@@ -1,82 +1,205 @@
 swagger: "2.0"
 
 info:
-    version: "1.0.1"
-    title: "My ToDoList"
-    description: "WW"
+  version: "1.0.1"
+  title: "My ToDoList"
+  description: "WW"
 
 paths:
-    /user:
-      post:
-        description: Запрос на создание пользователя
-        consumes:
-          - application/json
-        produces:
-          - application/json
-        parameters:
-          - in: body
-            name: fullName
-            schema:
-              type: string
-            description: new
-        responses:
-          201:
-            description: Added
-          500:
-            description: Ошибка
-      get:
-        tags:
-          - default
-        description: Получить
-        operationId: getUserList
-        consumes:
-          - application/json
-        responses:
-          200:
-            description: Ок
+  /user:
+    post:
+      tags:
+        - user
+      description: Запрос на создание пользователя
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: fullName
+          schema:
+            type: string
+          description: new
+      responses:
+        201:
+          description: Added
+        500:
+          description: Ошибка
+    get:
+      tags:
+        - user
+      description: Получить
+      operationId: getUserList
+      consumes:
+        - application/json
+      responses:
+        200:
+          description: Ок
 
-    /user/{userId}:
-      get:
-        description: Возвращает информацию о пользователе по id
-        summary: поиск пользователя по айди
-        operationId: getUserById
-        produces:
-          - application/json
-        consumes:
-          - application/json
-        responses:
-          200:
-            description: Ok
-      put:
-        description: Изменение
-        operationId: updateUserById
-        consumes:
-          - application/json
-        responses:
+  /user/{userId}:
+    get:
+      tags:
+        - user
+      description: Возвращает информацию о пользователе по id
+      summary: поиск пользователя по айди
+      operationId: getUserById
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          type: string
+      responses:
+        200:
+          description: Ok
+    put:
+      tags:
+        - user
+      description: Изменение
+      operationId: updateUserById
+      consumes:
+        - application/json
+      responses:
+        200:
+          description: Ok
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          type: string
+        - in: body
+          name: body
+          description: "Изменение информации о пользователе"
+          schema:
+            $ref: "#/definitions/User"
+    delete:
+      tags:
+        - user
+      description: Удаление
+      operationId: removeUserById
+      consumes:
+        - application/json
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          type: string
+      responses:
+        200:
+          description: Ok
 
-          200:
-            description: Ok
-      delete:
-        description: Удаление
-        operationId: updateUserById
-        consumes:
-          - application/json
-        responses:
-          200:
-            description: Ok
 
-    /user/{userId}/group:
-      get: { }
-      post: { }
-    /user/{userId}/group/{groupId}:
-      get: { }
-      put: { }
-      delete: { }
-    /user/{userId}/group/{groupId}/item:
-      get: { }
-      post: { }
-    /user/{userId}/group/{groupId}/item/{itemId}:
-      get: { }
-      put: { }
-      delete: { }
+  /user/{userId}/group:
+    get:
+      tags:
+        - group
+      description: у
+      summary: у
+      operationId: getGroupsByUserId
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          type: string
+      responses:
+        200:
+          description: Ok
+    post:
+      tags:
+        - group
+      description: Создание новой группы для айтемов
+      operationId: createNewGroupForUser
+      consumes:
+        - application/json
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
 
+  /user/{userId}/group/{groupId}:
+    get:
+      tags:
+        - group
+      description: у
+      summary: у
+      operationId: getGroupsByUserId
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          type: string
+        - name: "groupId"
+          in: "path"
+          required: true
+          type: string
+      responses:
+        200:
+          description: Ok
+    put: { }
+    delete:
+      tags:
+        - group
+      description: у
+      summary: у
+      operationId: getGroupsByUserId
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          type: string
+        - name: "groupId"
+          in: "path"
+          required: true
+          type: string
+      responses:
+        200:
+          description: Ok
+
+  /user/{userId}/group/{groupId}/item:
+    get: { }
+    post: { }
+  /user/{userId}/group/{groupId}/item/{itemId}:
+    get: { }
+    put: { }
+    delete: { }
+
+
+definitions:
+  User:
+    description: "Пользователь программы"
+    type: object
+    properties:
+      id:
+        type: "string"
+      fullName:
+        type: "string"
+  Group:
+    description: "Раздел/Группа дел"
+    type: object
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      userId:
+        type: "string"
+  Item:
+    description: "Элемент списка ToDo"
+    type: object
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      groupId:
+        type: "string"
+      activity:
+        type: "boolean"
