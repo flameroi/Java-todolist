@@ -1,16 +1,16 @@
 swagger: "2.0"
 
 info:
-  version: "1.0.1"
+  version: "1.0.3"
   title: "My ToDoList"
-  description: "WW"
+  description: "Тестовое задание цель которого реализация ToDo списка дел, "
 
 paths:
   /user:
     post:
       tags:
         - user
-      description: Запрос на создание пользователя
+      summary: Запрос на создание пользователя
       consumes:
         - application/json
       produces:
@@ -29,7 +29,7 @@ paths:
     get:
       tags:
         - user
-      description: Получить
+      summary: Запрос на получение полного списка пользователей
       operationId: getUserList
       consumes:
         - application/json
@@ -41,9 +41,9 @@ paths:
     get:
       tags:
         - user
-      description: Возвращает информацию о пользователе по id
-      summary: поиск пользователя по айди
-      operationId: getUserById
+      description: Возвращает всю информацию о пользователе
+      summary: Запрос на получение информации о пользователе по айди
+      operationId: getUserInfoById
       produces:
         - application/json
       consumes:
@@ -59,8 +59,9 @@ paths:
     put:
       tags:
         - user
-      description: Изменение
-      operationId: updateUserById
+      description: "Изменение ФИО пользователя"
+      summary: "Запрос на изменение информации о пользователе"
+      operationId: updateUserInfoById
       consumes:
         - application/json
       responses:
@@ -73,13 +74,13 @@ paths:
           type: string
         - in: body
           name: body
-          description: "Изменение информации о пользователе"
           schema:
             $ref: "#/definitions/User"
     delete:
       tags:
         - user
-      description: Удаление
+      summary: Запрос на удаление пользователя
+      description: Полное удаление информации о пользователе, вместе  спринадлежащими ему группами
       operationId: removeUserById
       consumes:
         - application/json
@@ -97,9 +98,8 @@ paths:
     get:
       tags:
         - group
-      description: у
-      summary: у
-      operationId: getGroupsByUserId
+      summary: Запрос на получение групп пользователя
+      operationId: getGroupListByUserId
       parameters:
         - name: "userId"
           in: "path"
@@ -111,7 +111,7 @@ paths:
     post:
       tags:
         - group
-      description: Создание новой группы для айтемов
+      summary: Запрос на создание новой группы для айтемов
       operationId: createNewGroupForUser
       consumes:
         - application/json
@@ -120,6 +120,10 @@ paths:
           in: "path"
           required: true
           type: string
+        - in: body
+          name: body
+          schema:
+            $ref: "#/definitions/Group"
       responses:
         200:
           description: Success
@@ -128,8 +132,7 @@ paths:
     get:
       tags:
         - group
-      description: у
-      summary: у
+      summary: Запрос на получение инфромации о пользователе
       operationId: getGroupsByUserId
       parameters:
         - name: "userId"
@@ -143,13 +146,33 @@ paths:
       responses:
         200:
           description: Ok
-    put: { }
+    put:
+      tags:
+        - group
+      summary: Запрос на изменение информации о группе
+      operationId: updateGroupInfoByGroupId
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          type: string
+        - name: "groupId"
+          in: "path"
+          required: true
+          type: string
+        - in: body
+          name: body
+          schema:
+            $ref: "#/definitions/Group"
+      responses:
+        200:
+          description: Ok
     delete:
       tags:
         - group
-      description: у
-      summary: у
-      operationId: getGroupsByUserId
+      summary: Запрос на удаление группы
+      description: Полное удаление группы и принадлежащих ей айтемов
+      operationId: removeGroupByGroupId
       parameters:
         - name: "userId"
           in: "path"
@@ -164,12 +187,114 @@ paths:
           description: Ok
 
   /user/{userId}/group/{groupId}/item:
-    get: { }
-    post: { }
+    get:
+      tags:
+        - item
+      summary: Запрос на получение списка айтемов в группе
+      operationId: getItemListByGroupId
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          type: string
+        - name: "groupId"
+          in: "path"
+          required: true
+          type: string
+      responses:
+        200:
+          description: Ok
+    post:
+      tags:
+        - item
+      summary: Запрос на создание нового айтема в группе
+      operationId: createNewItemInGroup
+      consumes:
+        - application/json
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          type: string
+        - name: "groupId"
+          in: "path"
+          required: true
+          type: string
+        - in: body
+          name: body
+          schema:
+            $ref: "#/definitions/Item"
+      responses:
+        200:
+          description: Success
   /user/{userId}/group/{groupId}/item/{itemId}:
-    get: { }
-    put: { }
-    delete: { }
+    get:
+      tags:
+        - item
+      summary: Запрос на получение инфромации о айтеме
+      operationId: getItemInfoByUserId
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          type: string
+        - name: "groupId"
+          in: "path"
+          required: true
+          type: string
+        - name: "itemId"
+          in: "path"
+          required: true
+          type: string
+      responses:
+        200:
+          description: Ok
+    put:
+      tags:
+        - item
+      summary: Запрос на изменение информации о айтеме
+      operationId: updateItemInfoByItemId
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          type: string
+        - name: "groupId"
+          in: "path"
+          required: true
+          type: string
+        - name: "itemId"
+          in: "path"
+          required: true
+          type: string
+        - in: body
+          name: body
+          schema:
+            $ref: "#/definitions/Item"
+      responses:
+        200:
+          description: Ok
+    delete:
+      tags:
+        - item
+      summary: Запрос на удаление айтема
+      operationId: removeItemByItemId
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          type: string
+        - name: "groupId"
+          in: "path"
+          required: true
+          type: string
+        - name: "itemId"
+          in: "path"
+          required: true
+          type: string
+      responses:
+        200:
+          description: Ok
 
 
 definitions:
