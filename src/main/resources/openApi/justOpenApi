@@ -23,9 +23,13 @@ paths:
           description: new
       responses:
         201:
-          description: Added
-        500:
-          description: Ошибка
+          description: Ok
+          schema:
+            $ref: '#/definitions/Response'
+        400:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
     get:
       tags:
         - user
@@ -35,7 +39,13 @@ paths:
         - application/json
       responses:
         200:
-          description: Ок
+          description: Ok
+          schema:
+            $ref: '#/definitions/Response'
+        400:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
 
   /user/{userId}:
     get:
@@ -56,6 +66,12 @@ paths:
       responses:
         200:
           description: Ok
+          schema:
+            $ref: '#/definitions/Response'
+        400:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
     put:
       tags:
         - user
@@ -64,9 +80,6 @@ paths:
       operationId: updateUserInfoById
       consumes:
         - application/json
-      responses:
-        200:
-          description: Ok
       parameters:
         - name: "userId"
           in: "path"
@@ -76,6 +89,15 @@ paths:
           name: body
           schema:
             $ref: "#/definitions/User"
+      responses:
+        200:
+          description: Ok
+          schema:
+            $ref: '#/definitions/Response'
+        400:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
     delete:
       tags:
         - user
@@ -92,6 +114,12 @@ paths:
       responses:
         200:
           description: Ok
+          schema:
+            $ref: '#/definitions/Response'
+        400:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
 
 
   /user/{userId}/group:
@@ -108,6 +136,12 @@ paths:
       responses:
         200:
           description: Ok
+          schema:
+            $ref: '#/definitions/Response'
+        400:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
     post:
       tags:
         - group
@@ -126,7 +160,13 @@ paths:
             $ref: "#/definitions/Group"
       responses:
         200:
-          description: Success
+          description: Ok
+          schema:
+            $ref: '#/definitions/Response'
+        400:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
 
   /user/{userId}/group/{groupId}:
     get:
@@ -146,6 +186,12 @@ paths:
       responses:
         200:
           description: Ok
+          schema:
+            $ref: '#/definitions/Response'
+        400:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
     put:
       tags:
         - group
@@ -167,6 +213,12 @@ paths:
       responses:
         200:
           description: Ok
+          schema:
+            $ref: '#/definitions/Response'
+        400:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
     delete:
       tags:
         - group
@@ -185,6 +237,12 @@ paths:
       responses:
         200:
           description: Ok
+          schema:
+            $ref: '#/definitions/Response'
+        400:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
 
   /user/{userId}/group/{groupId}/item:
     get:
@@ -204,6 +262,12 @@ paths:
       responses:
         200:
           description: Ok
+          schema:
+            $ref: '#/definitions/Response'
+        400:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
     post:
       tags:
         - item
@@ -226,7 +290,13 @@ paths:
             $ref: "#/definitions/Item"
       responses:
         200:
-          description: Success
+          description: Ok
+          schema:
+            $ref: '#/definitions/Response'
+        400:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
   /user/{userId}/group/{groupId}/item/{itemId}:
     get:
       tags:
@@ -249,6 +319,12 @@ paths:
       responses:
         200:
           description: Ok
+          schema:
+            $ref: '#/definitions/Response'
+        400:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
     put:
       tags:
         - item
@@ -274,6 +350,12 @@ paths:
       responses:
         200:
           description: Ok
+          schema:
+            $ref: '#/definitions/Response'
+        400:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
     delete:
       tags:
         - item
@@ -295,6 +377,12 @@ paths:
       responses:
         200:
           description: Ok
+          schema:
+            $ref: '#/definitions/Response'
+        400:
+          description: Error
+          schema:
+            $ref: '#/definitions/Error'
 
 
 definitions:
@@ -303,28 +391,54 @@ definitions:
     type: object
     properties:
       id:
-        type: "string"
+        type: string
+        example: "5f5f64b79974c54e17df7ece"
       fullName:
-        type: "string"
+        type: string
+        example: "Иванов Иван Иванович"
   Group:
     description: "Раздел/Группа дел"
     type: object
     properties:
       id:
-        type: "string"
+        type: string
+        example: "4e7f64b79974c32e17df7ece"
       name:
-        type: "string"
+        type: string
+        example: "Домашние дела"
       userId:
-        type: "string"
+        type: string
+        example: "5f5f64b79974c54e17df7ece"
   Item:
     description: "Элемент списка ToDo"
     type: object
     properties:
       id:
-        type: "string"
+        type: string
+        example: "2d9f51b74074c67e21df7aga"
       name:
-        type: "string"
+        type: string
+        example: "Закончить проект"
       groupId:
-        type: "string"
+        type: string
+        example: "4e7f64b79974c32e17df7ece"
       activity:
         type: "boolean"
+        example: true
+
+  Error:
+    properties:
+      resultCode:
+        type: integer
+        example: 400
+      resultMessage:
+        type: string
+        example: Всё сломалось.
+  Response:
+    properties:
+      resultCode:
+        type: integer
+        example: 200
+      resultMessage:
+        type: string
+        example: Выполнено успешно
