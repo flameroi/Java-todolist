@@ -8,6 +8,7 @@ info:
 paths:
   /user:
     post:
+      operationId: newUser
       tags:
         - user
       summary: Запрос на создание пользователя
