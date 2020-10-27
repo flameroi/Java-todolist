@@ -61,7 +61,6 @@ public class ItemController {
     }
 
     @ExceptionHandler
-//    public ResponseEntity<String> exceptionHandler(Exception exception, WebRequest request) {
     public ResponseEntity<String> exceptionHandler(Exception exception) {
         if (exception instanceof NotFoundOwnerException) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

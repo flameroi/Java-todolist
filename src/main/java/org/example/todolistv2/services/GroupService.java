@@ -1,11 +1,13 @@
 package org.example.todolistv2.services;
 
 import org.example.todolistv2.entity.Group;
+import org.example.todolistv2.entity.Item;
 import org.example.todolistv2.exceptions.NoAccessException;
 import org.example.todolistv2.exceptions.NotFoundOwnerException;
 import org.example.todolistv2.exceptions.NotFoundObjectException;
 import org.example.todolistv2.exceptions.BadRequestException;
 import org.example.todolistv2.mongotemplates.GroupRepository;
+import org.example.todolistv2.mongotemplates.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +17,13 @@ import java.util.List;
 public class GroupService {
     private final GroupRepository groupRepository;
     private final UserService userServices;
-    private final ItemService itemServices;
+    private final ItemRepository itemRepository;
 
     @Autowired
-    public GroupService(GroupRepository groupRepository, UserService userService, ItemService itemService){
+    public GroupService(GroupRepository groupRepository, UserService userService, ItemRepository itemRepository){
         this.groupRepository = groupRepository;
         this.userServices = userService;
-        this.itemServices = itemService;
+        this.itemRepository = itemRepository;
     }
 
     public boolean create(String userId, Group newGroup) {
@@ -68,7 +70,12 @@ public class GroupService {
             throw new NoAccessException();
         }
         groupRepository.delete(removingGroup);
-        itemServices.removeByGroupId(groupId);
+        //itemServices.removeByGroupId(groupId);
+        List<Item> removeItem = itemRepository.findItemsByGroupId(groupId);
+        if (removeItem != null) {
+            itemRepository.deleteAll(removeItem);
+            return true;
+        }
         return true;
     }
 
@@ -98,19 +105,6 @@ public class GroupService {
             throw new NoAccessException();
         }
         return group;
-    }
-
-    void removeByUserId(String groupId) {
-        if (groupId == null) {
-            throw new NullPointerException();
-        }
-        List<Group> removeGroups = groupRepository.findGroupByUserId(groupId);
-        if (removeGroups != null) {
-            for (Group group : removeGroups) {
-                itemServices.removeByGroupId(group.getId());
-            }
-            groupRepository.deleteAll(removeGroups);
-        }
     }
 
     boolean hasNotAccess(String userId, String groupId){
